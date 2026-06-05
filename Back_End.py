@@ -1,4 +1,4 @@
-import AI_agent as ai
+import gen_ai as ai
 import random
 
 #Questions for the game
@@ -50,7 +50,7 @@ class AI_Player:
             self.answer = answer
 
 def generateAnswer(question, player_answers):
-    return ai.aiPlayerAns(player_answers, question)
+    return ai.generate_gen_ai_answer(player_answers, question)
 
 #Added a function for validation of 3-6 players count. Revised.
 
@@ -146,7 +146,7 @@ def randomize_answers(vote_options, ai_original_id=None):
 
 #Revised
 def build_vote_options(players, ai_answer=None):
-    """Create an ID-based answer list for voting with randomized order, including the AI impostor if provided."""
+    """Create an ID-based answer list for voting with randomized order, including the Gen AI impostor if provided."""
     vote_options = {player.id: player.answer for player in players}
     ai_id = None
     if ai_answer is not None:
@@ -191,7 +191,7 @@ def create_round(question, nicknames, player_answers_by_id):
     """Build a single round state from nicknames, question, and player answers."""
     players = assign_player_ids(nicknames)
     collect_all_answers(players, player_answers_by_id)
-    ai_answer = AI_Player(ai.aiPlayerAns(get_player_answers(players), question)).answer
+    ai_answer = AI_Player(ai.generate_gen_ai_answer(get_player_answers(players), question)).answer
     vote_options, _ = build_vote_options(players, ai_answer)
     return {
         "question": question,

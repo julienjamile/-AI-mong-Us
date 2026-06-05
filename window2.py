@@ -114,7 +114,7 @@ STATE_COLLECTING   = 0
 STATE_VOTING       = 1
 STATE_RESULTS      = 2 
 STATE_PLAYER_WINS  = 3 
-STATE_AI_WINS      = 4 
+STATE_GEN_AI_WINS  = 4 
 
 # -- Fade Logic --
 fade_alpha = 0
@@ -151,7 +151,7 @@ GOLD_LIGHT, GOLD_DARK = (242, 228, 151), (169, 125, 63)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 
 # SET WINDOW NAME
-pygame.display.set_caption("\"AI\"mong Us")
+pygame.display.set_caption("\"Gen AI\"mong Us")
 
 # SET WINDOW ICON
 ICON_FILENAME = "Property 1=Default.png" 
@@ -311,7 +311,7 @@ def main():
         elif title_bar_active <= 0.1:
             hide_title_bar()  # Fully hidden
         
-        if state in [STATE_RESULTS, STATE_PLAYER_WINS, STATE_AI_WINS]:
+        if state in [STATE_RESULTS, STATE_PLAYER_WINS, STATE_GEN_AI_WINS]:
             draw_gradient_rect(screen, screen.get_rect(), GOLD_LIGHT, GOLD_DARK)
         elif bg: screen.blit(bg, (0,0))
         else: screen.fill((62, 58, 68))
@@ -376,7 +376,7 @@ def main():
             logo_r = img_win_logo.get_rect(center=(cx, SCREEN_HEIGHT // 2 - 120))
             text_r = img_win_text.get_rect(center=(cx, SCREEN_HEIGHT // 2 + 180))
             screen.blit(img_win_logo, logo_r); screen.blit(img_win_text, text_r)
-        elif state == STATE_AI_WINS:
+        elif state == STATE_GEN_AI_WINS:
             ai_logo_r = img_ai_win_logo.get_rect(center=(cx, SCREEN_HEIGHT // 2 - 120))
             ai_text_r = img_ai_win_text.get_rect(center=(cx, SCREEN_HEIGHT // 2 + 180))
             screen.blit(img_ai_win_logo, ai_logo_r); screen.blit(img_ai_win_text, ai_text_r)
@@ -437,7 +437,7 @@ def main():
                     is_fading, next_state = True, STATE_PLAYER_WINS 
                 elif state == STATE_PLAYER_WINS: 
                     if loser_sound: loser_sound.play()
-                    is_fading, next_state = True, STATE_AI_WINS
+                    is_fading, next_state = True, STATE_GEN_AI_WINS
 
             if event.type == pygame.KEYDOWN:
                 # Emergency exit for fullscreen

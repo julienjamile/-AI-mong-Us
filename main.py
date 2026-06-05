@@ -13,7 +13,7 @@ ASSETS_IMAGES = os.path.join(ASSETS_DIR, "images")
 ASSETS_SOUNDS = os.path.join(ASSETS_DIR, "sounds")
 ASSETS_FONTS = os.path.join(ASSETS_DIR, "fonts")
 
-AI_API_KEY = ""
+GEN_AI_API_KEY = ""
 
 
 def asset_path(*parts):
@@ -26,14 +26,14 @@ def _assign_player_ids(nicknames):
     return {pid: nn for pid, nn in zip(ids, nicknames)}
 
 
-def _patch_ai_agent_api_key(api_module, api_key):
+def _patch_gen_ai_api_key(api_module, api_key):
     if not api_key:
         return
 
-    api_module.AI_API_KEY = api_key
+    api_module.GEN_AI_API_KEY = api_key
 
 
-def _msgbox(title, message, kind="error"):
+def _msgbox(title, message, kind="error"): 
     import tkinter as tk
     from tkinter import messagebox
 
@@ -297,7 +297,7 @@ def run_window1(result_queue, w1_to_w2, w2_to_w1, w2_offset):
                 else:
                     w1.draw_retro_text(
                         screen,
-                        "AI is thinking...",
+                        "Gen AI is thinking...",
                         35,
                         w1.DESIGN_W // 2,
                         int(w1.DESIGN_H * 0.85),
@@ -368,9 +368,9 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
         pygame.quit()
         sys.exit()
     try:
-        import AI_agent
+        import gen_ai
     except ModuleNotFoundError as exc:
-        print(f"[DEBUG] AI_agent import failed: {exc}")
+        print(f"[DEBUG] gen_ai import failed: {exc}")
         if "google" in str(exc):
             _msgbox(
                 "Missing Dependency",
@@ -381,7 +381,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
             _msgbox("Import Error", str(exc), kind="error")
         pygame.quit()
         sys.exit()
-    _patch_ai_agent_api_key(AI_agent, AI_API_KEY)
+    _patch_gen_ai_api_key(gen_ai, GEN_AI_API_KEY)
 
     pygame.init()
     pygame.mixer.init()
@@ -422,7 +422,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
     STATE_VOTING = window2.STATE_VOTING
     STATE_RESULTS = window2.STATE_RESULTS
     STATE_PLAYER_WINS = window2.STATE_PLAYER_WINS
-    STATE_AI_WINS = window2.STATE_AI_WINS
+    STATE_GEN_AI_WINS = window2.STATE_GEN_AI_WINS
     SCREEN_WIDTH = window2.SCREEN_WIDTH
     SCREEN_HEIGHT = window2.SCREEN_HEIGHT
     FPS = window2.FPS
@@ -478,7 +478,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
             pygame.draw.line(screen, color, (0, y), (SCREEN_WIDTH, y))
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
-    pygame.display.set_caption('"AI"mong Us - Window 2')
+    pygame.display.set_caption('"Gen AI"mong Us - Window 2')
     clock = pygame.time.Clock()
 
     while True:
@@ -616,7 +616,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                 screen.blit(img_win_logo, logo_r)
                 screen.blit(img_win_text, text_r)
 
-            elif state == STATE_AI_WINS:
+            elif state == STATE_GEN_AI_WINS:
                 draw_background()
                 ai_logo_r = img_ai_win_logo.get_rect(center=(cx, SCREEN_HEIGHT // 2 - 120))
                 ai_text_r = img_ai_win_text.get_rect(center=(cx, SCREEN_HEIGHT // 2 + 180))
@@ -635,20 +635,20 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                 overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
                 overlay.fill((0, 0, 0, 180))
                 screen.blit(overlay, (0, 0))
-                thinking = font_body.render("AI is thinking...", True, (255, 255, 255))
+                thinking = font_body.render("Gen AI is thinking...", True, (255, 255, 255))
                 screen.blit(thinking, thinking.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)))
                 if ai_done_flag[0]:
                     ai_text = ai_answer_result[0]
                     if not isinstance(ai_text, str) or not ai_text.strip() or ai_text.lower().strip() in (
-                        "ai unavailable",
-                        "sorry, the ai is temporarily unavailable.",
-                        "sorry, could not connect to the ai.",
+                        "gen ai unavailable",
+                        "sorry, the gen ai is temporarily unavailable.",
+                        "sorry, could not connect to the gen ai.",
                     ):
-                        print(f"[DEBUG] AI response invalid: {ai_text!r}")
-                        print(f"[DEBUG] Using AI_API_KEY: {'SET' if AI_API_KEY.strip() else 'EMPTY'}")
+                        print(f"[DEBUG] Gen AI response invalid: {ai_text!r}")
+                        print(f"[DEBUG] Using GEN_AI_API_KEY: {'SET' if GEN_AI_API_KEY.strip() else 'EMPTY'}")
                         _msgbox(
-                            "AI Error",
-                            "The AI could not generate an answer. Check your API key and internet connection, then restart.",
+                            "Gen AI Error",
+                            "The Gen AI could not generate an answer. Check your API key and internet connection, then restart.",
                             kind="error",
                         )
                         pygame.quit()
@@ -656,8 +656,8 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                     vote_options, ai_display_id = be.build_vote_options(players, ai_text)
                     if ai_display_id is None:
                         _msgbox(
-                            "AI Error",
-                            "Unable to identify the AI answer after randomization. Restart the game.",
+                            "Gen AI Error",
+                            "Unable to identify the Gen AI answer after randomization. Restart the game.",
                             kind="error",
                         )
                         pygame.quit()
@@ -717,10 +717,10 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                                         sound.set_volume(1.0)
                                         sound.play()
                                     except Exception as e:
-                                        print(f"Failed to play AI generation sound: {e}")
+                                        print(f"Failed to play Gen AI generation sound: {e}")
                                     time.sleep(1)  # Give a moment for UI to settle
                                     answers = be.get_player_answers(players)
-                                    ai_answer_result[0] = AI_agent.aiPlayerAns(answers, question, api_key=AI_API_KEY)
+                                    ai_answer_result[0] = gen_ai.generate_gen_ai_answer(answers, question, api_key=GEN_AI_API_KEY)
                                     ai_done_flag[0] = True
 
                                 threading.Thread(target=_gen_ai, daemon=True).start()
@@ -753,7 +753,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                                 totals = be.tally_votes(votes_list)
                                 winner = be.determine_vote_winner(totals)
                                 if isinstance(winner, list) or winner != ai_display_id:
-                                    final_result = "ai_wins"
+                                    final_result = "gen_ai_wins"
                                 else:
                                     final_result = "players_win"
                                 w2_to_w1.put({
@@ -763,7 +763,7 @@ def run_window2(w1_to_w2, w2_to_w1, w2_offset):
                                 })
                                 game_active = False
 
-                    elif state in (STATE_PLAYER_WINS, STATE_AI_WINS):
+                    elif state in (STATE_PLAYER_WINS, STATE_GEN_AI_WINS):
                         pygame.display.iconify()
                         play_again = _msgbox("Game Over", "Would you like to play again?", kind="yesno")
                         if play_again:
@@ -805,9 +805,9 @@ def _detect_secondary_offset():
 
 if __name__ == "__main__":
     try:
-        src = open("AI_agent.py").read()
-        if 'api_key=""' in src or "api_key=''" in src:
-            print("WARNING: AI_agent.py has an empty API key. Fill it in before playing.")
+        src = open("gen_ai.py").read()
+        if 'GEN_AI_API_KEY = ""' in src or "GEN_AI_API_KEY = ''" in src:
+            print("WARNING: gen_ai.py has an empty API key. Fill it in before playing.")
     except Exception:
         pass
 

@@ -1,13 +1,13 @@
 import os
 import time
 
-AI_API_KEY = ""
+GEN_AI_API_KEY = ""
 
 # ans (list)
 # ques (String)
 
 def _get_api_key(override_key=None):
-    api_key = override_key or AI_API_KEY or os.environ.get("GOOGLE_API_KEY")
+    api_key = override_key or GEN_AI_API_KEY or os.environ.get("GOOGLE_API_KEY")
     if isinstance(api_key, str):
         api_key = api_key.strip()
     return api_key or None
@@ -36,24 +36,24 @@ def _extract_response_text(response):
     return None
 
 
-def aiPlayerAns(ans, ques, max_retries=5, api_key=None):
+def generate_gen_ai_answer(ans, ques, max_retries=5, api_key=None):
     try:
         from google import genai
     except ModuleNotFoundError:
         print("google-genai package is not installed.")
-        return "AI unavailable"
+        return "Gen AI unavailable"
 
     key = _get_api_key(api_key)
     if not key:
-        print("[DEBUG] No Google API key available. Set AI_API_KEY or GOOGLE_API_KEY.")
-        print(f"[DEBUG] override_key={api_key!r}, env_GOOGLE_API_KEY={'SET' if os.environ.get('GOOGLE_API_KEY') else 'EMPTY'}, module_AI_API_KEY={'SET' if AI_API_KEY.strip() else 'EMPTY'}")
-        return "AI unavailable"
+        print("[DEBUG] No Google API key available. Set GEN_AI_API_KEY or GOOGLE_API_KEY.")
+        print(f"[DEBUG] override_key={api_key!r}, env_GOOGLE_API_KEY={'SET' if os.environ.get('GOOGLE_API_KEY') else 'EMPTY'}, module_GEN_AI_API_KEY={'SET' if GEN_AI_API_KEY.strip() else 'EMPTY'}")
+        return "Gen AI unavailable"
 
     try:
         player_AI = genai.Client(api_key=key)
     except Exception as e:
         print(f"[DEBUG] Failed to create GenAI client: {e}")
-        return "AI unavailable"
+        return "Gen AI unavailable"
 
     delay = 1
     prompt = f"[QUESTION]\n{ques}\n\n[PLAYER ANSWERS]\n" + "\n".join(f"{i+1}. {a}" for i, a in enumerate(ans))
@@ -66,7 +66,7 @@ def aiPlayerAns(ans, ques, max_retries=5, api_key=None):
                 config={
                     "system_instruction": """
                             ROLE DEFINITION
-                            You are a covert AI participant embedded in a multiplayer game called \"AI\"mong Us. Your sole purpose is to generate a single, human-like answer to a given question that is indistinguishable from the answers submitted by real human players. You are the impostor. You must not be detected.
+                            You are a covert Gen AI participant embedded in a multiplayer game called \"Gen AI\"mong Us. Your sole purpose is to generate a single, human-like answer to a given question that is indistinguishable from the answers submitted by real human players. You are the impostor. You must not be detected.
 
                             PRIMARY OBJECTIVE
                             Generate one answer to the provided question that:
@@ -120,7 +120,7 @@ def aiPlayerAns(ans, ques, max_retries=5, api_key=None):
                             - Content Plausibility: Your answer must be a believable, relevant response to the question
                             - Avoid Perfection: Do not produce a textbook-perfect, polished, or overly eloquent answer
                             - Avoid Outliers: Do not copy a single player's unique phrasing or be so different you stand out
-                            - No Meta-language: Never include phrases like \"As an AI...\" or any formatting labels
+                            - No Meta-language: Never include phrases like \"As a Gen AI...\" or any formatting labels
                             - No Explanation: Output only the answer. No formatting. No quotes. No metadata.
                             - Subtle Human Variability: Naturally vary rhythm and phrasing slightly so it does not feel templated
 
@@ -142,15 +142,15 @@ def aiPlayerAns(ans, ques, max_retries=5, api_key=None):
             answer = _extract_response_text(response)
             if answer:
                 return answer
-            print(f"[DEBUG] AI response did not contain a text candidate. response={response!r}")
+            print(f"[DEBUG] Gen AI response did not contain a text candidate. response={response!r}")
             if hasattr(response, 'candidates'):
                 print(f"[DEBUG] response.candidates={getattr(response, 'candidates', None)!r}")
-            return "AI unavailable"
+            return "Gen AI unavailable"
         except genai.errors.ServerError as e:
             print(f"Server busy (503). Retry {attempt+1}/{max_retries} in {delay}s")
             time.sleep(delay)
             delay *= 2
         except Exception as e:
             print(f"Network error: {e}")
-            return "Sorry, could not connect to the AI."
-    return "Sorry, the AI is temporarily unavailable."
+            return "Sorry, could not connect to Gen AI."
+    return "Sorry, the Gen AI is temporarily unavailable."

@@ -586,7 +586,7 @@ class EndGameScene:
             surface.blit(text_surf, text_r)
 
         if self.ai_answer:
-            label = "AI-generated choice:"
+            label = "Gen AI-generated choice:"
             draw_text_pixel(surface, label, 25, WHITE, self.W // 2, int(self.H * 0.82))
             draw_text_wrapped(
                 surface,
@@ -721,15 +721,15 @@ class MenuScene:
         lines = [
             "3-6 PLAYERS JOIN THE GAME",
             "EACH PLAYER ANSWERS ONE QUESTION (MIN 10 WORDS)",
-            "ONE AI-GENERATED ANSWER IS ADDED SECRETLY",
+            "ONE Gen AI-GENERATED ANSWER IS ADDED SECRETLY",
             "PLAYERS CANNOT TALK OR SHARE ANSWERS",
             "ALL ANSWERS ARE SHUFFLED AND SHOWN ANONYMOUSLY",
-            "PLAYERS TAKE TURNS VOTING WHICH ANSWER IS AI",
+            "PLAYERS TAKE TURNS VOTING WHICH ANSWER IS FROM Gen AI",
             "AFTER VOTING, VOTES ARE COUNTED",
             "",
             "WINNING CONDITION:",
-            "PLAYERS WIN IF THEY SPOT THE AI",
-            "AI WINS IF PLAYERS FAIL TO IDENTIFY IT",
+            "PLAYERS WIN IF THEY SPOT THE Gen AI",
+            "Gen AI WINS IF PLAYERS FAIL TO IDENTIFY IT",
         ]
         for i, line in enumerate(lines):
             color = PINK_GLOW if "CONDITION" in line else WHITE
@@ -774,7 +774,7 @@ def main():
         (DESIGN_W, DESIGN_H),
         pygame.FULLSCREEN | pygame.SCALED
     )
-    pygame.display.set_caption("\"AI\"mong Us")
+    pygame.display.set_caption("\"Gen AI\"mong Us")
     clock = pygame.time.Clock()
     
     # ── TITLE BAR AUTO-HIDE ───────────────────────────────────────────────
